@@ -58,7 +58,7 @@ function! s:NewLine(chars) "{{{
  
   " length of the line -- should be ie 80 for Basket, and 50 for Fold
   " (using golden ratio of two thirds)
-  let l:columns = s:GetMaxLineLength()  * 0.667
+  let l:columns = s:GetMaxLineLength(0)  * 0.667
 
   let l:uline = repeat(l:chars, (l:columns / len(l:chars)) + 1)
  
@@ -72,27 +72,25 @@ endfunction
 function! s:NewFold(maxcolumns,chars) " {{{
  
   " chars: the character(s) to draw the bar with
-  let chars = empty(a:chars) ? '=' : a:chars
-  let chars_len = len(chars)
+  let l:chars = (a:chars) ? '=' : a:chars
+  let l:chars_len = len(chars)
  
   " &commentstring:     managed by commentary plugin
   " commentstring_len:  length of the comment rtring in this context
-  let commentstring_len = exists(&commentstring)? 2 : len(&commentstring)
+  " TODO: Find a better way to pull out the commentstring from NERDCommenter
+  let l:commentstring_len = exists(&commentstring)? 2 : len(&commentstring)
 
   " maxcolumns:  the maxium width of a line (i.e. &textwidth)
   " columns:       the number of chars to print in an underline
-  let columns  = (empty(a:maxcolumns) ? ( &textwidth ? 80 : &textwidth ) : a:maxcolumns )
-  let g:columns = columns - commentstring_len
-
+  let l:columns  = s:GetMaxLineLength(a:maxcolumns) - l:commentsting_len
 
   " blockline: the line of chars to form the block
-  let blockline = repeat(chars, (columns / chars_len) + 2)
+  let l:blockline = repeat(l:chars, (l:columns / l:chars_len) + 2)
 
-
-  put =strpart(blockline, 0, columns)
+  put s:DrawLine(l:blockline, l:columns)
   call s:CommentThisLine()
   normal k
-  put =strpart(blockline, 0, columns)
+  put s:DrawLine(l:blockline, l:columns)
   call s:CommentThisLine()
   normal 3j
 
